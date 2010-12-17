@@ -4,8 +4,17 @@ from array import array
 import math
 import urllib
 
-''' Utility module for LED-Screen at CCCB
-written by Warker, Ron, Denis
+'''
+----------------------------------------------------------------------------
+"THE BEER-WARE LICENSE" (Revision 42):
+Warker, Ron, Denis wrote this file. As long as you retain this notice you
+can do whatever you want with this stuff. If we meet some day, and you think
+this stuff is worth it, you can buy us a beer in return
+
+Follow me on twitter @warker
+----------------------------------------------------------------------------
+
+Utility module for LED-Screen at CCCB
 '''
 
 def HttpRequest(url, params=dict()):
