@@ -78,6 +78,7 @@ class VbbRequest(LedwandProvider):
                 else:
                     obj.Diff = self.timediffinmin(obj.Time)
 
+                ''' Filter for arrivals > 0min'''
                 if obj.Diff > 0:
                     self.List.append(obj)
             else:
