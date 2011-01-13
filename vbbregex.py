@@ -37,6 +37,7 @@ class VbbFahrt:
         self.Name, self.Time, self.Timeis, self.Dest, self.Platform, self.Diff = name, time, timeis, dest, platform, diff 
 
     def __repr__(self):
+        self.Dest = self.Dest.replace("(Berlin)", "")
         if len(self.Timeis) <= 0:
             self.Timeis = "        "
         if len(self.Platform) > 3: #some vbb request are just wrong
@@ -50,7 +51,7 @@ class VbbFahrt:
         return res.replace("&nbsp;", "");
 
 class VbbRequest(LedwandProvider):
-    def __init__(self, url = "http://www.vbb-fahrinfo.de/hafas/stboard.exe/dn?", stop="S+U Friedrichstr. Bhf (Berlin)", howmany=20, futuretime=5):
+    def __init__(self, url = "http://www.vbb-fahrinfo.de/hafas/stboard.exe/dn?", stop="S+U Friedrichstr. Bhf (Berlin)", howmany=50, futuretime=8):
         LedwandProvider.__init__(self)
         self.Url = url 
         self.Stop = stop
@@ -68,7 +69,7 @@ class VbbRequest(LedwandProvider):
         return HttpRequest(self.Url, {"boardOverview":"yes", "maxJourneys":self.Howmany, "boardType":"dep", "input":self.Stop, "start":"Start", "time":"%s:%s"%(h,m)})        
 
     def getData(self):
-        self.List.append("Haltestelle "+ self.Stop + " " + time.strftime("%H:%M"))
+        self.List.append("Haltestelle %s %s" %(self.Stop.replace("(Berlin)", ""), time.strftime("%H:%M")))
         self.List.append("%2s %4s %8s %s" %("Gl", "Typ", "Ankunft", "Richtung"))
         data = subHtmlcode(re.sub(r"[\t\r\n]","", self.getHtml().replace("&nbsp;",""))).decode("iso-8859-1").encode("utf8")
         m = re.findall(r"<tr class=\"depboard-\w+\".*?>.*?</tr>", data)

@@ -110,6 +110,7 @@ class LedwandProvider:
 
     def displayData(self):
         data = self.getData()
+        self.Ledwand.setbrightness(2)
         linecount = 0
         for obj in data:
             print "data:", obj
