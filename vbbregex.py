@@ -73,12 +73,13 @@ class VbbRequest(LedwandProvider):
                     obj.Timeis = ""
                 if obj.Platform is None:
                     obj.Platform = ""
-
                 if obj.Timeis != "&nbsp;" and len(obj.Timeis) > 0: #debug
                     obj.Diff = self.timediffinmin(obj.Timeis) # debug
                 else:
                     obj.Diff = self.timediffinmin(obj.Time)
-                self.List.append(obj)
+
+                if obj.Diff > 0:
+                    self.List.append(obj)
             else:
                 print "MISSED:", match
         return self.List
