@@ -62,7 +62,7 @@ class Ledwand:
         try:
             self.UdpSocket.recv(4096)
         except timeout:
-            print "Warning: last transmition timed out"
+            print "Warning: last transmission timed out"
 
     def setline(self, x, y, data):
         self.request(4, x, y, 1, 1, data)
