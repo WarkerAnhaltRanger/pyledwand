@@ -27,7 +27,7 @@ def HttpRequest(url, params=dict()):
 
 class Ledwand:
 
-    def __init__(self, host="172.23.42.120", port=2342, linelen=56, lines=19):
+    def __init__(self, host="172.23.42.120", port=2342, linelen=56, lines=20):
         self.UdpSocket = socket(AF_INET, SOCK_DGRAM)
         self.UdpAddress = (host, port)
         self.Linelen = linelen

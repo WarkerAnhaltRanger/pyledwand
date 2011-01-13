@@ -50,15 +50,22 @@ class VbbFahrt:
         return res.replace("&nbsp;", "");
 
 class VbbRequest(LedwandProvider):
-    def __init__(self, url = "http://www.vbb-fahrinfo.de/hafas/stboard.exe/dn?", stop="S+U Friedrichstr. Bhf (Berlin)", howmany=10):
+    def __init__(self, url = "http://www.vbb-fahrinfo.de/hafas/stboard.exe/dn?", stop="S+U Friedrichstr. Bhf (Berlin)", howmany=20, futuretime=5):
         LedwandProvider.__init__(self)
         self.Url = url 
         self.Stop = stop
         self.Howmany = howmany
         self.List = list()
+        self.Ftime = futuretime
 
     def getHtml(self):
-        return HttpRequest(self.Url, {"boardOverview":"yes", "maxJourneys":self.Howmany, "boardType":"dep", "input":self.Stop, "start":"Start"})        
+        t = time.localtime()
+        m, h = t.tm_min + self.Ftime, 0
+        while m > 60:
+            m = m / 60
+            h += 1
+        h = (h + t.tm_hour)%24
+        return HttpRequest(self.Url, {"boardOverview":"yes", "maxJourneys":self.Howmany, "boardType":"dep", "input":self.Stop, "start":"Start", "time":"%s:%s"%(h,m)})        
 
     def getData(self):
         self.List.append("Haltestelle "+ self.Stop + " " + time.strftime("%H:%M"))
