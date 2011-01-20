@@ -17,6 +17,11 @@ Follow me on twitter @warker
 Utility module for LED-Screen at CCCB
 '''
 
+def subHtmlcode(s, code):
+    for c in code:
+        s = s.replace(c[0], c[1])
+    return s
+
 def HttpRequest(url, params=dict()):
     if(params != dict()):
         f = urllib.urlopen("%s?%s" % (url, urllib.urlencode(params)))

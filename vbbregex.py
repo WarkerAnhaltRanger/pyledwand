@@ -44,12 +44,14 @@ class VbbFahrt:
             self.Platform = " "
         if len(self.Platform) > 0:
             res = "%2s %4s %8s %s" %(self.Platform, self.Name, `self.Diff`+"min", self.Dest)
+            #res = "%2s %4s %-30s %s%8s" %(self.Platform, self.Name, self.Dest, "+", `self.Diff`+"min")
         else:
             res = "   %4s %8s %s" %(self.Name, `self.Diff`+"min", self.Dest)
+            #res = "   %4s %-30s %8s" %(self.Name,  self.Dest, "+", `self.Diff`+"min")
         return res.replace("&nbsp;", "");
 
 class VbbRequest(LedwandProvider):
-    def __init__(self, url = "http://www.vbb-fahrinfo.de/hafas/stboard.exe/dn?", stop="S+U Friedrichstr. Bhf (Berlin)", howmany=50, futuretime=8):
+    def __init__(self, url = "http://www.vbb-fahrinfo.de/hafas/stboard.exe/dn?", stop="S+U Friedrichstr. Bhf (Berlin)", howmany=20, futuretime=8):
         LedwandProvider.__init__(self)
         self.Url = url 
         self.Stop = stop
@@ -101,7 +103,7 @@ class VbbRequest(LedwandProvider):
         return diff
 
 if __name__ == "__main__":
-    vbb = VbbRequest(howmany=17)
+    vbb = VbbRequest(futuretime=5)
     vbb.Ledwand.setbrightness(4)
     vbb.Ledwand.clear()
     while(1):
