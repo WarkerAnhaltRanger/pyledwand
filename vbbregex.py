@@ -43,10 +43,8 @@ class VbbFahrt:
         if len(self.Platform) > 3: #some vbb request are just wrong
             self.Platform = " "
         if len(self.Platform) > 0:
-            #res = "%2s %4s %5s %8s %s" %(self.Platform, self.Name, self.Time, self.Timeis, self.Dest)
             res = "%2s %4s %8s %s" %(self.Platform, self.Name, `self.Diff`+"min", self.Dest)
         else:
-            #res = "   %4s %5s %8s %s" %(self.Name, self.Time, self.Timeis, self.Dest)
             res = "   %4s %8s %s" %(self.Name, `self.Diff`+"min", self.Dest)
         return res.replace("&nbsp;", "");
 
