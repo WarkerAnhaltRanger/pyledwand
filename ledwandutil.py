@@ -46,10 +46,10 @@ class Ledwand:
         if len(line) < self.Linelen:
             return bytearray(line)
         else:
-            return  bytearray(line[0:self.Linelen])
+            return bytearray(line[0:self.Linelen])
 
     def sendline(self, linenum, line):
-        self.setlineraw(0, linenum, self.processline(line).tostring())
+        self.setlineraw(0, linenum, self.processline(str(line)))
 
     def setpixel(self, x, y, state):
         if x < (self.ModuleWidth*self.Linelen) and y < (self.ModuleHeight*self.Lines) and (y%self.ModuleHeight) <= 7:
