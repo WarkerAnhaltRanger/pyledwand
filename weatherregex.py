@@ -36,7 +36,7 @@ class WeatherRequest(LedwandProvider):
     def getData(self):
         count = 0
         orgPlz = self.Plz
-        self.List.append("Berlin Wettervorhersage")
+        self.List.append("Wettervorhersage  für Postleitzahlenbereich:" + `self.Plz`)
         self.List.append("%-5s %-5s %-12s %-12s %-12s"%("Min", "Max", "Vormittag", "Nachmittag", "Abend"))
         while count < 4:
             if count >= 1:

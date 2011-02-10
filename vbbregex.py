@@ -94,6 +94,7 @@ class VbbRequest(LedwandProvider):
         return self.List
 
     def clear(self):
+        self.Ledwand.clear()
         self.List = list()
 
     def timediffinmin(self, timestr):

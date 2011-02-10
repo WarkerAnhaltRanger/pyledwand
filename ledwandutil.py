@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from socket import *
-from array import array
+#from array import array
 import math
 import urllib
+import Image
 
 '''
 ----------------------------------------------------------------------------
@@ -32,25 +33,37 @@ def HttpRequest(url, params=dict()):
 
 class Ledwand:
 
-    def __init__(self, host="172.23.42.120", port=2342, linelen=56, lines=20):
+    def __init__(self, host="172.23.42.120", port=2342, linelen=56, lines=20, module_width=8, module_height=12):
         self.UdpSocket = socket(AF_INET, SOCK_DGRAM)
         self.UdpAddress = (host, port)
         self.Linelen = linelen
         self.Lines = lines
-        self.clearBuf()
+        self.ModuleWidth = module_width
+        self.ModuleHeight = module_height
+        self.DisplayBuf = bytearray(linelen*lines*self.ModuleWidth)
 
     def processline(self, line):
-        line = array('c', str(line))
-        tempbuf = array('c', " "*self.Linelen)
         if len(line) < self.Linelen:
-            tempbuf[0:len(line)] = line
+            return bytearray(line)
         else:
-            tempbuf = line[0:self.Linelen]
-        return tempbuf
+            return  bytearray(line[0:self.Linelen])
 
     def sendline(self, linenum, line):
         self.setlineraw(0, linenum, self.processline(line).tostring())
 
+    def setpixel(self, x, y, state):
+        if x < (self.ModuleWidth*self.Linelen) and y < (self.ModuleHeight*self.Lines) and (y%self.ModuleHeight) <= 7:
+            if state == True:
+                self.DisplayBuf[(y / self.ModuleHeight) * self.Linelen * self.ModuleWidth + x] |= (1 << (7-(y % self.ModuleHeight)))
+            else:
+                self.DisplayBuf[(y / self.ModuleHeight) * self.Linelen * self.ModuleWidth + x] &= ~(1 << (7-(y % self.ModuleHeight)))
+
+    def drawbuffer(self):
+        partsize = (self.Lines * self.Linelen * self.ModuleWidth) / 7
+        for i in range(7):
+            self.request(16, i*partsize, partsize, 0, 0, self.DisplayBuf[i*partsize:i*partsize+partsize])
+        self.refresh()
+        
     def convert(self, x):
         x1 = math.floor(x / 256)
         x2 = math.fmod(x, 256)
@@ -99,11 +112,34 @@ class Ledwand:
         self.DisplayBuf[linenum*self.Linelen:(linenum+1)*self.Linelen] = self.processline(line)
 
     def sendfilledBuf(self):
-        self.request(3, 0, 0, self.Linelen, self.Lines, self.DisplayBuf.tostring().decode("utf8").encode("cp437"))
+        self.request(3, 0, 0, self.Linelen, self.Lines, self.DisplayBuf.decode("utf8").encode("cp437"))
     
     def clearBuf(self):
-        self.DisplayBuf = array('c', " "*self.Linelen*self.Lines)
+        self.DisplayBuf = bytearray(self.Linelen*self.Lines)
+
+    def refresh(self):
+        self.request(17, 0, 0, 0, 0, '')
         
+    def drawImage(self, path):   
+        img = Image.open(path) 
+        xs, ys = img.size
+        xfactor, yfactor = (self.Linelen*self.ModuleWidth)/float(xs), (self.Lines*self.ModuleHeight)/float(ys)
+        factor = 1.0
+        if xfactor < yfactor:
+            factor = xfactor
+        else:
+            factor = yfactor
+        print "factor", factor
+        img = img.resize((int(factor*xs), int(factor*ys))).convert("1")
+        xs, ys = img.size
+        x, y = 0, 0
+        for pix in img.getdata():
+            if x >= xs:
+                y, x = y+1, 0
+            if pix > 0:
+                self.setpixel(x,y,True)
+            x=x+1
+        self.drawbuffer()
 
 class LedwandProvider:
 
@@ -121,3 +157,17 @@ class LedwandProvider:
             print "data:", obj
             self.Ledwand.sendline(linecount, obj)
             linecount += 1
+
+
+def main():
+    print "started main"
+    ledwand = Ledwand()
+    ledwand.clear()
+    #ledwand.setpixel(2,2,True)
+    #ledwand.setpixel(2,3,True)
+    #ledwand.drawbuffer()
+    ledwand.drawImage("Mona.jpg")
+    #ledwand.drawImage("test.jpg")
+
+if __name__ ==  "__main__":
+    main()
