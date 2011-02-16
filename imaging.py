@@ -2,11 +2,13 @@ from ledwandutil import Ledwand
 import Image
 
 class ImageLedwand(Ledwand):
-    def __init__(self):
-        Ledwand.__init__(self)
+    def __init__(self, timeout):
+        Ledwand.__init__(self, timeout=timeout)
+
+    def drawImageFile(self, path):
+        self.drawImage(Image.open(path))
     
-    def drawImage(self, path):   
-        img = Image.open(path) 
+    def drawImage(self, img):   
         xs, ys = img.size
         xfactor, yfactor = (self.Linelen*self.ModuleWidth)/float(xs), (self.Lines*self.ModuleHeight)/float(ys)
         factor = 1.0

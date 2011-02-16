@@ -33,7 +33,7 @@ def HttpRequest(url, params=dict()):
 
 class Ledwand:
 
-    def __init__(self, host="172.23.42.120", port=2342, linelen=56, lines=20, module_width=8, module_height=12):
+    def __init__(self, host="172.23.42.120",port=2342, timeout=1, linelen=56, lines=20, module_width=8, module_height=12):
         self.UdpSocket = socket(AF_INET, SOCK_DGRAM)
         self.UdpAddress = (host, port)
         self.Linelen = linelen
@@ -41,6 +41,7 @@ class Ledwand:
         self.ModuleWidth = module_width
         self.ModuleHeight = module_height
         self.DisplayBuf = bytearray(linelen*lines*self.ModuleWidth)
+        self.Timeout = timeout
 
     def processline(self, line):
         if len(line) < self.Linelen:
@@ -59,6 +60,7 @@ class Ledwand:
                 self.DisplayBuf[(y / self.ModuleHeight) * self.Linelen * self.ModuleWidth + x] &= ~(1 << (7-(y % self.ModuleHeight)))
 
     def drawbuffer(self):
+        #split into 7 parts to avoid crashing of the Screen
         partsize = (self.Lines * self.Linelen * self.ModuleWidth) / 7
         for i in range(7):
             self.request(16, i*partsize, partsize, 0, 0, self.DisplayBuf[i*partsize:i*partsize+partsize])
@@ -75,7 +77,7 @@ class Ledwand:
         ypos = self.convert(ypos)
         xs = self.convert(xs)
         ys = self.convert(ys)
-        self.UdpSocket.settimeout(1)
+        self.UdpSocket.settimeout(self.Timeout)
         self.UdpSocket.sendto(cmd + xpos + ypos + xs + ys + text, self.UdpAddress)
         try:
             self.UdpSocket.recv(4096)
