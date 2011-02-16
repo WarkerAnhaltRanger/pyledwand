@@ -54,7 +54,7 @@ class Ledwand:
 
     def setpixel(self, x, y, state):
         if x < (self.ModuleWidth*self.Linelen) and y < (self.ModuleHeight*self.Lines) and (y%self.ModuleHeight) <= 7:
-            if state == True:
+            if state:
                 self.DisplayBuf[(y / self.ModuleHeight) * self.Linelen * self.ModuleWidth + x] |= (1 << (7-(y % self.ModuleHeight)))
             else:
                 self.DisplayBuf[(y / self.ModuleHeight) * self.Linelen * self.ModuleWidth + x] &= ~(1 << (7-(y % self.ModuleHeight)))
@@ -83,6 +83,7 @@ class Ledwand:
             self.UdpSocket.recv(4096)
         except timeout:
             print "Warning: last transmission timed out"
+            pass
 
     def setline(self, x, y, data):
         self.request(4, x, y, 1, 1, data)

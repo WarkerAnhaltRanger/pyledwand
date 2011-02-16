@@ -3,6 +3,11 @@ import Image
 from imaging import ImageLedwand
 import gobject
 
+'''
+Todo: Optimierungen:    - check von size in imaging entfernen
+                                            - img Objekt nur in __init__ erstellen und im.from
+'''
+
 class LedwandSink(gst.BaseSink):
     __gsttemplates__=(
         gst.PadTemplate("sink",
@@ -17,17 +22,16 @@ class LedwandSink(gst.BaseSink):
         self.__gobject_init__()
         self.set_name(name)
         self.ledwand = ImageLedwand(timeout=0.03/7.0) #30fps = 0.033ms/7Parts
-        self.ledwand
+        self.Image = Image.new("RGBA", (448,160))
         print "init end"
 
     def do_render(self, buffer):
         if buffer:
-            width = buffer.caps[0]["width"]
-            height = buffer.caps[0]["height"]
-            colorbits = int((float(buffer.size) / width / height) * 8.0)
-            img = Image.frombuffer("RGBA", (width, height), buffer.data)
-            print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits
-            self.ledwand.drawImage(img)
+            #width = buffer.caps[0]["width"]
+            #height = buffer.caps[0]["height"]
+            self.Image.fromstring(buffer.data)
+            #print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits
+            self.ledwand.drawImage(self.Image)
             #print "size", buffer.size, "Caps", buffer.caps
         else:
             print "no data"

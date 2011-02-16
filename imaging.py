@@ -7,8 +7,8 @@ class ImageLedwand(Ledwand):
 
     def drawImageFile(self, path):
         self.drawImage(Image.open(path))
-    
-    def drawImage(self, img):   
+
+    def resizeImage(self, img):
         xs, ys = img.size
         xfactor, yfactor = (self.Linelen*self.ModuleWidth)/float(xs), (self.Lines*self.ModuleHeight)/float(ys)
         factor = 1.0
@@ -17,7 +17,10 @@ class ImageLedwand(Ledwand):
         else:
             factor = yfactor
         print "factor", factor
-        img = img.resize((int(factor*xs), int(factor*ys))).convert("1")
+        return img.resize((int(factor*xs), int(factor*ys)))
+    
+    def drawImage(self, img):   
+        img = img.convert("1")
         xs, ys = img.size
         x, y = 0, 0
         for pix in img.getdata():
