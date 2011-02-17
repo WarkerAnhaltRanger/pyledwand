@@ -30,17 +30,18 @@ class LedwandSink(gst.BaseSink):
             height = buffer.caps[0]["height"]
             colorbits = buffer.size/width/height*8.0
             print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits'''
-        if self.count % 7 == 0:
-            self.Image.fromstring(buffer)
-            self.ledwand.drawImage(self.Image)
+        #if self.count % 7 == 0:
+        self.Image.fromstring(buffer)
+        self.ledwand.drawImage(self.Image)
         self.count += 1
         return gst.FLOW_OK
 
 class MyPlayer:
     def __init__(self, filepath):
         self.player = gst.element_factory_make("playbin2")
-        self.player.set_property("uri", "file://" + filepath)
+        self.player.set_property("uri", "file://" +filepath)
         #sink = gst.element_factory_make("aasink")
+        #sink = gst.element_factory_make("xvimagesink")
         sink = LedwandSink("sink")
         self.player.set_property("video_sink", sink)
         bus = self.player.get_bus()
@@ -65,7 +66,8 @@ class MyPlayer:
 
 def main():
     gobject.type_register(LedwandSink)
-    filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
+    #filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
+    filepath = "/home/warker/Desktop/cccb/pyledwand/video2.avi"
     print "started main"
     mp = MyPlayer(filepath)
     mp.play()
