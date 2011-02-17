@@ -41,8 +41,8 @@ class Ledwand:
         self.ModuleWidth = module_width
         self.ModuleHeight = module_height
         self.DisplayBuf = bytearray(linelen*lines*self.ModuleWidth)
-        self.Timeout = timeout
-
+        self.UdpSocket.settimeout(timeout)
+        
     def processline(self, line):
         if len(line) < self.Linelen:
             return bytearray(line)
@@ -63,13 +63,17 @@ class Ledwand:
         #split into 7 parts to avoid crashing of the Screen
         partsize = (self.Lines * self.Linelen * self.ModuleWidth) / 7
         for i in range(7):
-            self.request(16, i*partsize, partsize, 0, 0, self.DisplayBuf[i*partsize:i*partsize+partsize])
-        self.refresh()
+            if i !=6:
+                self.request(16, i*partsize, partsize, 0, 0, self.DisplayBuf[i*partsize:i*partsize+partsize])
+            else:
+               self.request(16, i*partsize, partsize, 2342, 2342, self.DisplayBuf[i*partsize:i*partsize+partsize])
+        #self.refresh()
+
         
     def convert(self, x):
-        x1 = math.floor(x / 256)
-        x2 = math.fmod(x, 256)
-        return chr(int(x2)) + chr(int(x1))
+        x1 = x/256
+        x2 = x%256
+        return chr(x2) + chr(x1)
 
     def request(self, cmd, xpos, ypos, xs, ys, text):
         cmd = self.convert(cmd)
@@ -77,13 +81,12 @@ class Ledwand:
         ypos = self.convert(ypos)
         xs = self.convert(xs)
         ys = self.convert(ys)
-        self.UdpSocket.settimeout(self.Timeout)
         self.UdpSocket.sendto(cmd + xpos + ypos + xs + ys + text, self.UdpAddress)
         try:
             self.UdpSocket.recv(4096)
         except timeout:
             print "Warning: last transmission timed out"
-            pass
+            #pass
 
     def setline(self, x, y, data):
         self.request(4, x, y, 1, 1, data)
