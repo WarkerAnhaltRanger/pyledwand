@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 from socket import *
-#from array import array
-import math
 import urllib
 import Image
 
