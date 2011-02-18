@@ -37,20 +37,23 @@ class ImageLedwand(Ledwand):
             x=x+1
         self.drawbuffer()
 
-    def drawImage2(self, img): #broken
+    def drawImage2(self, img): #broken?
         img = img.convert("1")
         data = img.getdata()
-        pixline = self.Linelen*self.ModuleWidth
-        for i in range(self.Lines*pixline):
-            self.DisplayBuf[i] = data[i] & 0x10000000 | data[i+pixline] & 0x1000000 | data[i+2*pixline] & 0x100000 | data[i+3*pixline] & 0x10000 | data[i+4*pixline]  & 0x1000 | data[i+5*pixline]  & 0x100 | data[i+6*pixline] & 0x10 | data[i+7*pixline] & 0x1
-            self.drawbuffer()
+        line = self.Linelen*self.ModuleWidth
+        step = line*(self.ModuleWidth-1)
+        for i in range(self.Lines*line):
+            pos = (i/line)*step
+            self.DisplayBuf[i] = (data[i+pos] & 0x10000000) | (data[i+pos+line] & 0x1000000) | (data[i+pos+2*line] & 0x100000) | (data[i+pos+3*line] & 0x10000) | (data[i+pos+4*line] & 0x1000) | (data[i+pos+5*line] & 0x100) | (data[i+pos+6*line] & 0x10) | (data[i+pos+7*line] & 0x1)
+        self.drawbuffer()
 
-    def drawImage3(self, buffer): #broken
+    def drawImage3(self, buffer): #broken?
         data = bytearray(buffer.data)
-        pixline = self.Linelen*self.ModuleWidth/self.ModuleHeight
-        for i in range(self.Lines*self.Linelen*self.ModuleWidth):
-            self.DisplayBuf[i] =  data[i] & 0x10000000 | (data[i+pixline]>>1) & 0x1000000 | (data[i+2*pixline]>>2) & 0x100000 | (data[i+3*pixline]>>3) & 0x10000 | (data[i+4*pixline]>>4) & 0x1000 | (data[i+5*pixline]>>5) & 0x100 | (data[i+6*pixline]>>6) & 0x10 | (data[i+7*pixline]>>7) & 0x1
-            #self.DisplayBuf = (data[i] & 0x10000000 | (data[i+pixline]>>1) & 0x1000000 | (data[i+2*pixline]>>2) & 0x100000 | (data[i+3*pixline]>>3) & 0x10000 | (data[i+4*pixline]>>4) & 0x1000 | (data[i+5*pixline]>>5) & 0x100 | (data[i+6*pixline]>>6) & 0x10 | (data[i+7*pixline]>>7) & 0x1 for i in range(self.Lines*pixline))
+        line = self.Linelen*self.ModuleWidth
+        step = line*(self.ModuleWidth-1)
+        for i in range(self.Lines*line):
+            pos = (i/line)*step
+            self.DisplayBuf[i] = data[i+pos] & 0x10000000 | (data[i+pos+line]>>1) & 0x1000000 | (data[i+pos+2*line]>>2) & 0x100000 | (data[i+pos+3*line]>>3) & 0x10000 | (data[i+pos+4*line]>>4) & 0x1000 | (data[i+pos+5*line]>>5) & 0x100 | (data[i+pos+6*line]>>6) & 0x10 | (data[i+pos+7*line]>>7) & 0x1
         self.drawbuffer()
         
 def main():
