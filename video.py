@@ -8,6 +8,8 @@ Todo: Optimierungen:    -zu viele setpixel aufrufe!
                                             -konvertierung ohne Image
 '''
 
+loop = None
+
 class LedwandSink(gst.BaseSink):
     __gsttemplates__=(
         gst.PadTemplate("sink",
@@ -20,7 +22,7 @@ class LedwandSink(gst.BaseSink):
         self.count = 0
         self.__gobject_init__()
         self.set_name(name)
-        self.ledwand = ImageLedwand(timeout=0.0001) #30fps = 0.033s/7Parts~=4ms
+        self.ledwand = ImageLedwand(timeout=1) #30fps = 0.033s/7Parts~=4ms
         self.Image = Image.new("L", (448, 160))
         self.ledwand.setbrightness(8)
         
@@ -30,10 +32,10 @@ class LedwandSink(gst.BaseSink):
             colorbits = buffer.size/width/height*8.0
             print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits'''
         #if self.count % 7 == 0:
-        self.Image.fromstring(buffer)
-        #self.ledwand.drawImage(self.Image)
-        #self.ledwand.drawImage3(buffer)
-        self.ledwand.drawImage2(self.Image)
+        #self.Image.fromstring(buffer)
+        #self.ledwand.drawImage5(self.Image)
+        self.ledwand.drawImage4(buffer)
+        #self.ledwand.drawImage4(self.Image)
         self.count += 1
         return gst.FLOW_OK
 
@@ -49,16 +51,17 @@ class MyPlayer:
         bus.add_watch(self.on_message)
 
     def on_message(self, bus, message):
+        global loop
         t = message.type
         if t == gst.MESSAGE_EOS:
                 self.player.set_state(gst.STATE_NULL)
                 print "EOS"
-                quit()
+                loop.quit()
         elif t == gst.MESSAGE_ERROR:
                 self.player.set_state(gst.STATE_NULL)
                 err, debug = message.parse_error()
                 print "Error: %s" % err, debug
-                quit()
+                loop.quit()
         return True
 
     def play(self):
@@ -66,6 +69,7 @@ class MyPlayer:
         self.player.set_state(gst.STATE_PLAYING)
 
 def main():
+    global loop
     gobject.type_register(LedwandSink)
     filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/video2.avi"

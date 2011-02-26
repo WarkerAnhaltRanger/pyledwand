@@ -1,9 +1,12 @@
 from ledwandutil import Ledwand
 import Image
+from ctypes import *
 
 class ImageLedwand(Ledwand):
     def __init__(self, timeout=1):
-        Ledwand.__init__(self, timeout=timeout)
+        Ledwand.__init__(self,timeout=timeout)
+        self.videolib = CDLL('./videolib/bin/Release/libvideolib.so')
+        self.ImageBuf = create_string_buffer(self.Lines*self.Linelen*self.ModuleWidth)
 
     def drawImageFile(self, path):
         self.drawImage(Image.open(path))
@@ -37,24 +40,13 @@ class ImageLedwand(Ledwand):
             x=x+1
         self.drawbuffer()
 
-    def drawImage2(self, img): #broken?
-        img = img.convert("1")
-        data = img.getdata()
-        line = self.Linelen*self.ModuleWidth
-        step = line*(self.ModuleWidth-1)
-        for i in range(self.Lines*line):
-            pos = (i/line)*step
-            self.DisplayBuf[i] = (data[i+pos] & 0x10000000) | (data[i+pos+line] & 0x1000000) | (data[i+pos+2*line] & 0x100000) | (data[i+pos+3*line] & 0x10000) | (data[i+pos+4*line] & 0x1000) | (data[i+pos+5*line] & 0x100) | (data[i+pos+6*line] & 0x10) | (data[i+pos+7*line] & 0x1)
-        self.drawbuffer()
-
-    def drawImage3(self, buffer): #broken?
-        data = bytearray(buffer.data)
-        line = self.Linelen*self.ModuleWidth
-        step = line*(self.ModuleWidth-1)
-        for i in range(self.Lines*line):
-            pos = (i/line)*step
-            self.DisplayBuf[i] = data[i+pos] & 0x10000000 | (data[i+pos+line]>>1) & 0x1000000 | (data[i+pos+2*line]>>2) & 0x100000 | (data[i+pos+3*line]>>3) & 0x10000 | (data[i+pos+4*line]>>4) & 0x1000 | (data[i+pos+5*line]>>5) & 0x100 | (data[i+pos+6*line]>>6) & 0x10 | (data[i+pos+7*line]>>7) & 0x1
-        self.drawbuffer()
+    def drawImage4(self, buffer):
+        data = buffer.data
+        #print "datalen", len(data)
+        if self.videolib.Regular_to_Ledbuffer(data, len(data), self.ImageBuf) != 0:
+            print "ERROR"
+        self.DisplayBuf = self.ImageBuf.raw
+        self.drawbuffer()    
         
 def main():
     print "started main"
