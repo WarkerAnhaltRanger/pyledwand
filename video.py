@@ -3,11 +3,6 @@ from imaging import ImageLedwand
 import gobject
 import Image
 
-'''
-Todo: Optimierungen:    -zu viele setpixel aufrufe!
-                                            -konvertierung ohne Image
-'''
-
 loop = None
 
 class LedwandSink(gst.BaseSink):
@@ -24,18 +19,17 @@ class LedwandSink(gst.BaseSink):
         self.set_name(name)
         self.ledwand = ImageLedwand(timeout=1) #30fps = 0.033s/7Parts~=4ms
         self.Image = Image.new("L", (448, 160))
-        self.ledwand.setbrightness(8)
+        self.ledwand.setbrightness(4)
         
-    def do_render(self, buffer):
+    def do_render(self, buf):
         '''width = buffer.caps[0]["width"]
             height = buffer.caps[0]["height"]
             colorbits = buffer.size/width/height*8.0
             print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits'''
+        #self.Image.fromstring(buf)
+        #self.ledwand.drawImage(self.Image)
         #if self.count % 7 == 0:
-        #self.Image.fromstring(buffer)
-        #self.ledwand.drawImage5(self.Image)
-        self.ledwand.drawImage4(buffer)
-        #self.ledwand.drawImage4(self.Image)
+        self.ledwand.drawImage4(buf.data)
         self.count += 1
         return gst.FLOW_OK
 
@@ -46,6 +40,8 @@ class MyPlayer:
         #sink = gst.element_factory_make("aasink")
         #sink = gst.element_factory_make("xvimagesink")
         sink = LedwandSink("sink")
+        zero = gst.element_factory_make("fakesink")
+        self.player.set_property("audio_sink", zero)
         self.player.set_property("video_sink", sink)
         bus = self.player.get_bus()
         bus.add_watch(self.on_message)
@@ -73,6 +69,7 @@ def main():
     gobject.type_register(LedwandSink)
     filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/video2.avi"
+    #ilepath = "/home/warker/Desktop/matrix.avi"
     print "started main"
     mp = MyPlayer(filepath)
     mp.play()

@@ -64,7 +64,7 @@ class Ledwand:
             if i !=6:
                 self.request(16, i*partsize, partsize, 0, 0, self.DisplayBuf[i*partsize:i*partsize+partsize])
             else:
-               self.request(16, i*partsize, partsize, 4223, 4223, self.DisplayBuf[i*partsize:i*partsize+partsize])
+               self.request(16, i*partsize, partsize, 2342, 2342, self.DisplayBuf[i*partsize:i*partsize+partsize])
         
     def convert(self, x):
         x1 = x/256

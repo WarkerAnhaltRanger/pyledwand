@@ -40,9 +40,7 @@ class ImageLedwand(Ledwand):
             x=x+1
         self.drawbuffer()
 
-    def drawImage4(self, buffer):
-        data = buffer.data
-        #print "datalen", len(data)
+    def drawImage4(self, data):
         if self.videolib.Regular_to_Ledbuffer(data, len(data), self.ImageBuf) != 0:
             print "ERROR"
         self.DisplayBuf = self.ImageBuf.raw
