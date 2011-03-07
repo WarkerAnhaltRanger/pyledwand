@@ -7,6 +7,8 @@ class ImageLedwand(Ledwand):
         Ledwand.__init__(self,timeout=timeout)
         self.videolib = CDLL('./videolib/bin/Release/libvideolib.so')
         self.ImageBuf = create_string_buffer(self.Lines*self.Linelen*self.ModuleWidth)
+        self.ImageCmp = create_string_buffer(self.Lines*self.Linelen*self.ModuleWidth)
+        self.setbrightness(4)
 
     def drawImageFile(self, path):
         self.drawImage(Image.open(path))
@@ -41,11 +43,28 @@ class ImageLedwand(Ledwand):
         self.drawbuffer()
 
     def drawImage4(self, data):
+        self.ImageBuf2 = self.ImageBuf
         if self.videolib.Regular_to_Ledbuffer(data, len(data), self.ImageBuf) != 0:
             print "ERROR"
-        self.DisplayBuf = self.ImageBuf.raw
-        self.drawbuffer()    
+        if self.videolib.compare_Buffs(self.ImageBuf, len(self.ImageBuf), self.ImageBuf2, len(self.ImageBuf2), self.ImageCmp, len(self.ImageCmp) != 0):
+            print "compare buffer ERROR"
+        self.DisplayBuf = self.ImageBuf
+        self.drawbuffer()
+
+    def drawDiffImage(self, diffbuf, newbuf):
+        data = list()
+        record, tmp = False, 0
+        for i in range(len(diffbuf)):
+            if diffbuf[i] != 0:
+                if record == False:
+                    tmp, record = i, True 
+            else:
+                if record == True:
+                    data.append((tmp,i))
+                    record = False
+        # data hat nun das format list(tuple(changedstartpos, changedendpos))
         
+                
 def main():
     print "started main"
     ledwand = ImageLedwand()
