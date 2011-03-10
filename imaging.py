@@ -43,28 +43,25 @@ class ImageLedwand(Ledwand):
         self.drawbuffer()
 
     def drawImage4(self, data):
-        self.ImageBuf2 = self.ImageBuf
+        self.ImageBuf2 = self.ImageBuf[:]
         if self.videolib.Regular_to_Ledbuffer(data, len(data), self.ImageBuf) != 0:
             print "ERROR"
         if self.videolib.compare_Buffs(self.ImageBuf, len(self.ImageBuf), self.ImageBuf2, len(self.ImageBuf2), self.ImageCmp, len(self.ImageCmp) != 0):
             print "compare buffer ERROR"
         self.DisplayBuf = self.ImageBuf
-        self.drawbuffer()
+        self.drawDiffImage(self.ImageCmp)
 
-    def drawDiffImage(self, diffbuf, newbuf):
+    def drawDiffImage(self, diffbuf):
         data = list()
-        record, tmp = False, 0
-        for i in range(len(diffbuf)):
-            if diffbuf[i] != 0:
-                if record == False:
-                    tmp, record = i, True 
+        i = 0
+        while(i<len(diffbuf)):
+            if ord(diffbuf[i])==0:
+                i+=1
             else:
-                if record == True:
-                    data.append((tmp,i))
-                    record = False
-        # data hat nun das format list(tuple(changedstartpos, changedendpos))
+                data.append(i)
+                i+=len(diffbuf)/7
+        self.drawselectedbuffer(data)
         
-                
 def main():
     print "started main"
     ledwand = ImageLedwand()

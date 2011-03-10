@@ -18,18 +18,23 @@ class LedwandSink(gst.BaseSink):
         self.set_name(name)
         self.ledwand = ImageLedwand(timeout=1) #30fps = 0.033s/7Parts~=4ms
         self.Image = Image.new("L", (448, 160))
-        #self.ledwand.setbrightness(4)
+        self.ledwand.setbrightness(4)
         
     def do_render(self, buf):
         '''width = buffer.caps[0]["width"]
             height = buffer.caps[0]["height"]
             colorbits = buffer.size/width/height*8.0
             print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits'''
-        #self.Image.fromstring(buf)
+        self.Image.fromstring(buf)
+        self.ledwand.drawImage4(self.flat(self.Image.convert("1")))
         #self.ledwand.drawImage(self.Image)
         #if self.count % 7 == 0:
-        self.ledwand.drawImage4(buf.data)
+        #self.ledwand.drawImage4(buf.data)
         return gst.FLOW_OK
+
+    def flat(self, img):
+        return str(bytearray(list(img.getdata())))
+        
 
 class MyPlayer:
     def __init__(self, filepath):
@@ -68,7 +73,7 @@ def main():
     gobject.type_register(LedwandSink)
     #filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/video2.avi"
-    filepath = "/home/warker/Desktop/Filmseminar/filme/Hackers.avi" #kein segfault wenn nicht gesendet wird
+    filepath = "/home/warker/Desktop/Filmseminar/filme/Hackers.avi"
     print "started main"
     mp = MyPlayer(filepath)
     mp.play()

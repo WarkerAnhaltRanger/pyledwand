@@ -1,4 +1,5 @@
 # depslib dependency file v1.0
-1299172076 source:/home/warker/Desktop/cccb/pyledwand/videolib/main.c
+1299773282 source:/home/warker/Desktop/cccb/pyledwand/videolib/main.c
 	<stdio.h>
+	<stdint.h>
 

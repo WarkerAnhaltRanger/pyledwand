@@ -53,7 +53,7 @@ int Regular_to_Ledbuffer(const char* imagebuf, uint32_t len, char* ledbuffer)
 }
 
 
-int compare_Buffs(const int* buf1, const size_t buf1_len, const int* buf2, const size_t buf2_len, int* diffbuf, const size_t diffbuf_len)
+int compare_Buffs(const char* buf1, const size_t buf1_len, const char* buf2, const size_t buf2_len, char* diffbuf, const size_t diffbuf_len)
 {
     if(buf1_len != buf2_len && buf1_len != diffbuf_len)
     {
@@ -63,10 +63,11 @@ int compare_Buffs(const int* buf1, const size_t buf1_len, const int* buf2, const
 
     size_t i = 0;
 
-    for(i=0; i<(size_t)(diffbuf_len/sizeof(int)); i++)
-        diffbuf[i] = buf1[i] ^ buf2[i];
+    /*for(i=0; i<buf1_len; i+=sizeof(uint32_t))
+        diffbuf[i] = *((uint32_t*)buf1+i) ^ *((uint32_t*)buf2+i);*/
 
-    //for(i=0; i<buf1_len; i+=sizeof(uint32_t))
-    //    diffbuf[i] = *((uint32_t*)buf+i) ^ *((uint32_t*)buf2+i)
+    for(i=0; i<buf1_len; i++)
+        diffbuf[i] = buf1[i]^buf2[i];
+
     return 0;
 }

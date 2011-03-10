@@ -65,6 +65,15 @@ class Ledwand:
                 self.request(16, i*partsize, partsize, 0, 0, self.DisplayBuf[i*partsize:i*partsize+partsize])
             else:
                self.request(16, i*partsize, partsize, 2342, 2342, self.DisplayBuf[i*partsize:i*partsize+partsize])
+
+    def drawselectedbuffer(self, data):
+        print data 
+        partsize = len(self.DisplayBuf)/7
+        for i in range(len(data)):
+            if i !=len(data)-1:
+                self.request(16, data[i], partsize, 0, 0, self.DisplayBuf[data[i]:data[i]+partsize])
+            else:
+                self.request(16, data[i], partsize, 2342, 2342, self.DisplayBuf[data[i]:data[i]+partsize])
         
     def convert(self, x):
         x1 = x/256
