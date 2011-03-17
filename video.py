@@ -1,5 +1,6 @@
 import gst
 from imaging import ImageLedwand
+import ImageFilter
 import gobject
 import Image
 
@@ -10,7 +11,7 @@ class LedwandSink(gst.BaseSink):
         gst.PadTemplate("sink",
                         gst.PAD_SINK,
                         gst.PAD_ALWAYS,
-                        gst.Caps("video/x-raw-gray, bbp=8,width=448, height=160")),
+                        gst.Caps("video/x-raw-gray, width=448, height=160")),
         )
 
     def __init__(self, name):
@@ -19,6 +20,7 @@ class LedwandSink(gst.BaseSink):
         self.ledwand = ImageLedwand(timeout=1) #30fps = 0.033s/7Parts~=4ms
         self.Image = Image.new("L", (448, 160))
         self.ledwand.setbrightness(4)
+        self.ledwand.clear()
         
     def do_render(self, buf):
         '''width = buffer.caps[0]["width"]
@@ -26,7 +28,9 @@ class LedwandSink(gst.BaseSink):
             colorbits = buffer.size/width/height*8.0
             print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits'''
         self.Image.fromstring(buf)
-        self.ledwand.drawImage4(self.flat(self.Image.convert("1")))
+        img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
+        #img = self.Image.convert("1")
+        self.ledwand.drawImage4(self.flat(img))
         #self.ledwand.drawImage(self.Image)
         #if self.count % 7 == 0:
         #self.ledwand.drawImage4(buf.data)
@@ -72,8 +76,8 @@ def main():
     global loop
     gobject.type_register(LedwandSink)
     #filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
-    #filepath = "/home/warker/Desktop/cccb/pyledwand/video2.avi"
-    filepath = "/home/warker/Desktop/Filmseminar/filme/Hackers.avi"
+    #filepath = "/home/warker/Desktop/Filmseminar/filme/Hackers.avi"
+    filepath = "/home/warker/Desktop/cccb/pyledwand/kt2.flv"
     print "started main"
     mp = MyPlayer(filepath)
     mp.play()

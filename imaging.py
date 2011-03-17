@@ -58,15 +58,20 @@ class ImageLedwand(Ledwand):
             if ord(diffbuf[i])==0:
                 i+=1
             else:
-                data.append(i)
-                i+=len(diffbuf)/7
+                j = i+len(diffbuf)/self.Parts
+                if j >= len(diffbuf):
+                    j = len(diffbuf)-1
+                while(j>i and ord(diffbuf[j]) == 0):
+                      j-=1
+                data.append((i,j))
+                i+=len(diffbuf)/self.Parts
         self.drawselectedbuffer(data)
         
 def main():
     print "started main"
     ledwand = ImageLedwand()
     ledwand.clear()
-    ledwand.drawResizedImageFile("Mona.jpg")
+    ledwand.drawResizedImageFile("ob.jpg")
 
 if __name__ ==  "__main__":
     main()
