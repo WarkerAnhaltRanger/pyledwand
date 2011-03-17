@@ -5,6 +5,7 @@
 #define LINELEN 56
 #define MODWIDTH 8
 #define MODHEIGHT 12
+#define BIAS 5
 
 int Image_to_Ledbuffer(const char* imagebuf, uint32_t len, char* ledbuffer)
 {
@@ -48,7 +49,67 @@ int Regular_to_Ledbuffer(const char* imagebuf, uint32_t len, char* ledbuffer)
                         ((imagebuf[pos+5*LINELEN*MODWIDTH]>>5) & 0x4) |
                         ((imagebuf[pos+6*LINELEN*MODWIDTH]>>6) & 0x2) |
                         ((imagebuf[pos+7*LINELEN*MODWIDTH]>>7) & 0x1);
+        }
+    return 0;
+}
+
+int Regular_to_Ledbuffer2(const char* imagebuf, uint32_t len, char* ledbuffer)
+{
+    if(len != LINES*LINELEN*MODWIDTH*MODWIDTH)
+    {
+        printf("size of imagebuf should be %d but is %d\n", LINELEN*LINES*MODWIDTH*MODWIDTH, len);
+        return 1;
     }
+    uint32_t i = 0, pos = 0, middle = 0;
+    for(i = 0; i<LINELEN*MODWIDTH*LINES; i++)
+    {
+        pos = (i%(LINELEN*MODWIDTH))+(((uint32_t)(i/(MODWIDTH*LINELEN)))*MODWIDTH*LINELEN*MODWIDTH);
+        middle = (imagebuf[pos]+imagebuf[pos+LINELEN*MODWIDTH] + imagebuf[pos+2*LINELEN*MODWIDTH] +
+                  imagebuf[pos+3*LINELEN*MODWIDTH] + imagebuf[pos+4*LINELEN*MODWIDTH] +
+                  imagebuf[pos+5*LINELEN*MODWIDTH] + imagebuf[pos+6*LINELEN*MODWIDTH] +
+                  imagebuf[pos+7*LINELEN*MODWIDTH])/8;
+
+        if(imagebuf[pos]>middle && imagebuf[pos]>BIAS)
+            ledbuffer[i] |= 1<<7;
+        else
+            ledbuffer[i] &= ~(1<<7);
+
+        if(imagebuf[pos+LINELEN*MODWIDTH]>middle && imagebuf[pos+LINELEN*MODWIDTH]>BIAS)
+            ledbuffer[i] |= 1<<6;
+        else
+            ledbuffer[i] &= ~(1<<6);
+
+        if(imagebuf[pos+2*LINELEN*MODWIDTH]>middle && imagebuf[pos+2*LINELEN*MODWIDTH]>BIAS)
+            ledbuffer[i] |= 1<<5;
+        else
+            ledbuffer[i] &= ~(1<<5);
+
+        if(imagebuf[pos+3*LINELEN*MODWIDTH]>middle && imagebuf[pos+3*LINELEN*MODWIDTH]>BIAS)
+            ledbuffer[i] |= 1<<4;
+        else
+            ledbuffer[i] &= ~(1<<4);
+
+        if(imagebuf[pos+4*LINELEN*MODWIDTH]>middle && imagebuf[pos+4*LINELEN*MODWIDTH]>BIAS)
+            ledbuffer[i] |= 1<<3;
+        else
+            ledbuffer[i] &= ~(1<<3);
+
+        if(imagebuf[pos+5*LINELEN*MODWIDTH]>middle && imagebuf[pos+5*LINELEN*MODWIDTH]>BIAS)
+            ledbuffer[i] |= 1<<2;
+        else
+            ledbuffer[i] &= ~(1<<2);
+
+        if(imagebuf[pos+6*LINELEN*MODWIDTH]>middle && imagebuf[pos+6*LINELEN*MODWIDTH]>BIAS)
+            ledbuffer[i] |= 1<<1;
+        else
+            ledbuffer[i] &= ~(1<<1);
+
+        if(imagebuf[pos+7*LINELEN*MODWIDTH]>middle && imagebuf[pos+7*LINELEN*MODWIDTH]>BIAS)
+            ledbuffer[i] |= 0x1;
+        else
+            ledbuffer[i] &= ~(0x1);
+
+        }
     return 0;
 }
 

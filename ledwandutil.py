@@ -79,7 +79,7 @@ class Ledwand:
             else:
                 self.request(16, data[i][0], partsize, 2342, 2342, self.DisplayBuf[data[i][0]:data[i][1]])
                 #self.request(16, data[i], partsize, 2342, 2342, self.DisplayBuf[data[i]:data[i]+partsize])
-        print "saved", fullsize, "bytes"
+        print "saved", fullsize-1, "bytes"
         
     def convert(self, x):
         x1 = x/256
