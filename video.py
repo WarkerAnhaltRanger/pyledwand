@@ -3,6 +3,7 @@ from imaging import ImageLedwand
 import ImageFilter
 import gobject
 import Image
+from threading import Thread
 
 loop = None
 
@@ -21,24 +22,47 @@ class LedwandSink(gst.BaseSink):
         self.Image = Image.new("L", (448, 160))
         self.ledwand.setbrightness(4)
         self.ledwand.clear()
+        self.Ready = True
+        self.T = Drawer()
+        self.count = 0
         
     def do_render(self, buf):
         '''width = buffer.caps[0]["width"]
             height = buffer.caps[0]["height"]
             colorbits = buffer.size/width/height*8.0
             print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits'''
-        self.Image.fromstring(buf)
-        img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
-        #img = self.Image.convert("1")
-        self.ledwand.drawImage4(self.flat(img))
-        #self.ledwand.drawImage(self.Image)
-        #if self.count % 7 == 0:
-        #self.ledwand.drawImage4(buf.data)
+        if(self.Ready == True):
+            if(self.count >= 5):
+                #self.B = buf
+                #self.T.start_draw(self,buf[:])
+                #self.T.join()
+                self.Image.fromstring(buf)
+                img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
+                self.ledwand.drawImage4(self.flat(img))
+                self.count = 0
+        self.count += 1
         return gst.FLOW_OK
 
     def flat(self, img):
         return str(bytearray(list(img.getdata())))
-        
+
+
+class Drawer(Thread):
+    def start_draw(self, sender, buf):
+        self.sender = sender
+        self.buf = buf
+        Thread.start(self)
+    
+    def run(self):
+        vid = self.sender
+        vid.Ready = False
+        buf = self.buf
+        vid.Image.fromstring(buf)
+        img = vid.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
+        vid.ledwand.drawImage4(vid.flat(img))
+        vid.Ready = True
+            
+
 
 class MyPlayer:
     def __init__(self, filepath):
@@ -78,7 +102,8 @@ def main():
     #filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
     #filepath = "/home/warker/Desktop/Filmseminar/filme/Hackers.avi"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/kt2.flv"
-    filepath = "/home/warker/Desktop/cccb/pyledwand/quarks.mp4"
+    filepath = "/home/warker/Desktop/crcl-eagle.eye.xvid.avi"
+    #filepath = "/home/warker/Desktop/cccb/pyledwand/quarks.mp4"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/porn.3gp"
     print "started main"
     mp = MyPlayer(filepath)
