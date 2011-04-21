@@ -22,47 +22,19 @@ class LedwandSink(gst.BaseSink):
         self.Image = Image.new("L", (448, 160))
         self.ledwand.setbrightness(4)
         self.ledwand.clear()
-        self.Ready = True
-        self.T = Drawer()
-        self.count = 0
         
     def do_render(self, buf):
         '''width = buffer.caps[0]["width"]
             height = buffer.caps[0]["height"]
             colorbits = buffer.size/width/height*8.0
             print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits'''
-        if(self.Ready == True):
-            if(self.count >= 5):
-                #self.B = buf
-                #self.T.start_draw(self,buf[:])
-                #self.T.join()
-                self.Image.fromstring(buf)
-                img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
-                self.ledwand.drawImage4(self.flat(img))
-                self.count = 0
-        self.count += 1
+        self.Image.fromstring(buf)
+        img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
+        self.ledwand.drawImage4(self.flat(img))
         return gst.FLOW_OK
 
     def flat(self, img):
         return str(bytearray(list(img.getdata())))
-
-
-class Drawer(Thread):
-    def start_draw(self, sender, buf):
-        self.sender = sender
-        self.buf = buf
-        Thread.start(self)
-    
-    def run(self):
-        vid = self.sender
-        vid.Ready = False
-        buf = self.buf
-        vid.Image.fromstring(buf)
-        img = vid.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
-        vid.ledwand.drawImage4(vid.flat(img))
-        vid.Ready = True
-            
-
 
 class MyPlayer:
     def __init__(self, filepath):
@@ -99,12 +71,14 @@ class MyPlayer:
 def main():
     global loop
     gobject.type_register(LedwandSink)
+
     #filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
     #filepath = "/home/warker/Desktop/Filmseminar/filme/Hackers.avi"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/kt2.flv"
     filepath = "/home/warker/Desktop/crcl-eagle.eye.xvid.avi"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/quarks.mp4"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/porn.3gp"
+
     print "started main"
     mp = MyPlayer(filepath)
     mp.play()

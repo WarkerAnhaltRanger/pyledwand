@@ -105,7 +105,7 @@ class VbbRequest(LedwandProvider):
 
 if __name__ == "__main__":
     vbb = VbbRequest(futuretime=5)
-    vbb.Ledwand.setbrightness(4)
+    vbb.Ledwand.setbrightness(6)
     vbb.Ledwand.clear()
     while(1):
         vbb.clear()

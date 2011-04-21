@@ -74,12 +74,15 @@ class Ledwand:
             partsize = data[i][1]-data[i][0]
             fullsize -= partsize
             if i !=len(data)-1:
-                self.request(16, data[i][0], partsize, 0, 0, self.DisplayBuf[data[i][0]:data[i][1]])
+                if(i==0):
+                    self.requestnowait(16, data[i][0], partsize, 2342, 2342, self.DisplayBuf[data[i][0]:data[i][1]])
+                else:
+                    self.request(16, data[i][0], partsize, 0, 0, self.DisplayBuf[data[i][0]:data[i][1]])
                 #self.request(16, data[i], partsize, 0, 0, self.DisplayBuf[data[i]:data[i]+partsize])
             else:
                 self.request(16, data[i][0], partsize, 2342, 2342, self.DisplayBuf[data[i][0]:data[i][1]])
                 #self.request(16, data[i], partsize, 2342, 2342, self.DisplayBuf[data[i]:data[i]+partsize])
-        print "saved", fullsize-1, "bytes"
+        #print "saved", fullsize-1, "bytes"
         
     def convert(self, x):
         x1 = x/256
@@ -87,17 +90,20 @@ class Ledwand:
         return chr(x2) + chr(x1)
 
     def request(self, cmd, xpos, ypos, xs, ys, text):
+        self.requestnowait(cmd, xpos, ypos, xs, ys, text)
+        try:
+            self.UdpSocket.recv(4096)
+        except timeout:
+            print "Warning: last transmission timed out"
+            #pass
+
+    def requestnowait(self, cmd, xpos, ypos, xs, ys, text):
         cmd = self.convert(cmd)
         xpos = self.convert(xpos)
         ypos = self.convert(ypos)
         xs = self.convert(xs)
         ys = self.convert(ys)
         self.UdpSocket.sendto(cmd + xpos + ypos + xs + ys + text, self.UdpAddress)
-        try:
-            self.UdpSocket.recv(4096)
-        except timeout:
-            print "Warning: last transmission timed out"
-            #pass
 
     def setline(self, x, y, data):
         self.request(4, x, y, 1, 1, data)
@@ -147,7 +153,7 @@ class LedwandProvider:
 
     def displayData(self):
         data = self.getData()
-        self.Ledwand.setbrightness(2)
+        self.Ledwand.setbrightness(4)
         linecount = 0
         for obj in data:
             print "data:", obj
