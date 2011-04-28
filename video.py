@@ -72,10 +72,10 @@ def main():
     global loop
     gobject.type_register(LedwandSink)
 
-    #filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
+    filepath = "/home/warker/Desktop/cccb/pyledwand/video.mpeg"
     #filepath = "/home/warker/Desktop/Filmseminar/filme/Hackers.avi"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/kt2.flv"
-    filepath = "/home/warker/Desktop/crcl-eagle.eye.xvid.avi"
+    #filepath = "/home/warker/Desktop/crcl-eagle.eye.xvid.avi"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/quarks.mp4"
     #filepath = "/home/warker/Desktop/cccb/pyledwand/porn.3gp"
 

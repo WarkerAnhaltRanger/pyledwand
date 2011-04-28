@@ -63,7 +63,7 @@ class Ledwand:
         partsize = (self.Lines * self.Linelen * self.ModuleWidth) / self.Parts
         for i in range(self.Parts):
             if i !=(self.Parts-1):
-                self.request(16, i*partsize, partsize, 0, 0, self.DisplayBuf[i*partsize:i*partsize+partsize])
+                self.request(16, i*partsize, partsize, 5, 5, self.DisplayBuf[i*partsize:i*partsize+partsize])
             else:
                self.request(16, i*partsize, partsize, 2342, 2342, self.DisplayBuf[i*partsize:i*partsize+partsize])
 
@@ -74,11 +74,7 @@ class Ledwand:
             partsize = data[i][1]-data[i][0]
             fullsize -= partsize
             if i !=len(data)-1:
-                if(i==0):
-                    self.requestnowait(16, data[i][0], partsize, 2342, 2342, self.DisplayBuf[data[i][0]:data[i][1]])
-                else:
-                    self.request(16, data[i][0], partsize, 0, 0, self.DisplayBuf[data[i][0]:data[i][1]])
-                #self.request(16, data[i], partsize, 0, 0, self.DisplayBuf[data[i]:data[i]+partsize])
+                self.request(16, data[i][0], partsize, 0, 0, self.DisplayBuf[data[i][0]:data[i][1]])
             else:
                 self.request(16, data[i][0], partsize, 2342, 2342, self.DisplayBuf[data[i][0]:data[i][1]])
                 #self.request(16, data[i], partsize, 2342, 2342, self.DisplayBuf[data[i]:data[i]+partsize])

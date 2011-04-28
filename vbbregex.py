@@ -74,7 +74,7 @@ class VbbRequest(LedwandProvider):
         data = subHtmlcode(re.sub(r"[\t\r\n]","", self.getHtml().replace("&nbsp;",""))).decode("iso-8859-1").encode("utf8")
         m = re.findall(r"<tr class=\"depboard-\w+\".*?>.*?</tr>", data)
         for match in m:
-            m1 = re.search(r"<td class=\"time\">(?P<time>.*?)</td>(<td class=\"prognosis(.*?\"><img.*?/>|.*?\">)(ca.)?(?P<timeis>.*?)</td>)?<td class=\"product\">.*?/> *(?P<name>[A-Z0-9]*)</a></td><td class=\"timetable\"><strong>(?P<to>.*?)</strong></td>(<td class=\"platform\">(?P<platform>.+?)( *<br.*?)?</td>)?", match)
+            m1 = re.search(r"<td class=\"time\">(?P<time>.*?)</td>(<td class=\"prognosis(.*?\"><img.*?/>|.*?\">)(ca.)?(?P<timeis>.*?)</td>)?<td class=\"product\">.*?/> *(?P<name>[A-Z0-9]*)</a></td><td class=\"timetable\"><strong>(?P<to>.*?)</strong>.*?</td>(<td class=\"platform\">(?P<platform>.+?)( *<br.*?)?</td>)?", match)
             if m1 != None:
                 obj = VbbFahrt(m1.group("name"), m1.group("time"), m1.group("timeis"), m1.group("to"), m1.group("platform"))
                 if obj.Timeis is None: # Sometimes there is no predicted time, so we repair
