@@ -29,24 +29,26 @@ class WeatherRequest(LedwandProvider):
         self.Url = url
         self.Plz = str(plz)
         self.List = list()
+        self.tPlz = self.Plz
 
     def getHtml(self):
         return HttpRequest(self.Url, {"L":"dep"+self.Plz})
 
     def getData(self):
+        self.Ledwand.clear()
+        self.List = list()
         count = 0
-        orgPlz = self.Plz
-        self.List.append("Wettervorhersage  für Postleitzahlenbereich:" + `self.Plz`)
+        orgPlz = self.tPlz
+        self.List.append("Wettervorhersage  für Postleitzahlenbereich:" + orgPlz)
         self.List.append("%-5s %-5s %-12s %-12s %-12s"%("Min", "Max", "Vormittag", "Nachmittag", "Abend"))
         while count < 4:
-            if count >= 1:
-                self.Plz = orgPlz + "0" + `count`
+            self.Plz = orgPlz + "0" + `count`
             data = subHtmlcode(re.sub(r"[\t\r\n]","",self.getHtml()), HTMLCODES)
             m = re.findall(r"<div class=\"city\">.*?</table>", data)
             for match in m:
-                print match
+                #print match
                 m1 = re.search(r"<td class=\"mintemp\".*?>(?P<mintemp>.*?)</td>.*?<td class=\"maxtemp\".*?>(?P<maxtemp>.*?)</td>.*?<img.*?alt=\"(?P<vormittag>.*?)\".*?></td>.*?<img.*?alt=\"(?P<nachmittag>.*?)\".*?></td>.*?<img.*?alt=\"(?P<abend>.*?)\".*?></td>",match)
-                print m1.group("mintemp"), m1.group("maxtemp"),  m1.group("vormittag"), m1.group("nachmittag"), m1.group("abend")
+                #print m1.group("mintemp"), m1.group("maxtemp"),  m1.group("vormittag"), m1.group("nachmittag"), m1.group("abend")
                 obj = WeatherObj(m1.group("mintemp"), m1.group("maxtemp"),  m1.group("vormittag"), m1.group("nachmittag"), m1.group("abend"))
                 self.List.append(obj)
             count += 1

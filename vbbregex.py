@@ -66,15 +66,16 @@ class VbbRequest(LedwandProvider):
             m = m / 60
             h += 1
         h = (h + t.tm_hour)%24
-        return HttpRequest(self.Url, {"boardOverview":"yes", "maxJourneys":self.Howmany, "boardType":"dep", "input":self.Stop, "start":"Start", "time":"%s:%s"%(h,m)})        
+        return HttpRequest(self.Url, {"boardOverview":"yes", "maxJourneys":self.Howmany, "boardType":"dep", "input":self.Stop, "start":"Start", "time":"%s:%s"%(h,m), "start":"Erstellen"})        
 
     def getData(self):
+        self.clear()
         self.List.append("Haltestelle %s %s" %(self.Stop.replace("(Berlin)", ""), time.strftime("%H:%M")))
         self.List.append("%2s %4s %8s %s" %("Gl", "Typ", "Ankunft", "Richtung"))
         data = subHtmlcode(re.sub(r"[\t\r\n]","", self.getHtml().replace("&nbsp;",""))).decode("iso-8859-1").encode("utf8")
         m = re.findall(r"<tr class=\"depboard-\w+\".*?>.*?</tr>", data)
         for match in m:
-            m1 = re.search(r"<td class=\"time\">(?P<time>.*?)</td>(<td class=\"prognosis(.*?\"><img.*?/>|.*?\">)(ca.)?(?P<timeis>.*?)</td>)?<td class=\"product\">.*?/> *(?P<name>[A-Z0-9]*)</a></td><td class=\"timetable\"><strong>(?P<to>.*?)</strong>.*?</td>(<td class=\"platform\">(?P<platform>.+?)( *<br.*?)?</td>)?", match)
+            m1 = re.search(r"<td class=\"time\">(?P<time>.*?)</td>(<td class=\"prognosis(.*?/><img.*?/>|.*?\"><img.*?/>|.*?\">)(ca.)?(?P<timeis>.*?)</td>)?<td class=\"product\">.*?/> *(?P<name>[A-Z0-9]*)</a></td><td class=\"timetable\"><strong>(?P<to>.*?)</strong>.*?</td>(<td class=\"platform\">(?P<platform>.+?)( *<br.*?)?</td>)?", match)
             if m1 != None:
                 obj = VbbFahrt(m1.group("name"), m1.group("time"), m1.group("timeis"), m1.group("to"), m1.group("platform"))
                 if obj.Timeis is None: # Sometimes there is no predicted time, so we repair
@@ -99,9 +100,11 @@ class VbbRequest(LedwandProvider):
 
     def timediffinmin(self, timestr):
         t = time.localtime()
-        d = time.strptime(timestr, "%H:%M")
-        diff = (d.tm_hour - t.tm_hour)*60 + (d.tm_min - t.tm_min)
-        return diff
+        if ":" in timestr:
+            d = time.strptime(timestr, "%H:%M")
+            diff = (d.tm_hour - t.tm_hour)*60 + (d.tm_min - t.tm_min)
+            return diff
+        return -1
 
 if __name__ == "__main__":
     vbb = VbbRequest(futuretime=5)
