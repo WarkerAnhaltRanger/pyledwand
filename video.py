@@ -24,15 +24,17 @@ class LedwandSink(gst.BaseSink):
         self.Image = Image.new("L", (448, 200))
         self.ledwand.setbrightness(4)
         self.ledwand.clear()
+        self.Framecount = 0
+        self.Framedrop = 2
         
     def do_render(self, buf):
-        '''width = buffer.caps[0]["width"]
-            height = buffer.caps[0]["height"]
-            colorbits = buffer.size/width/height*8.0
-            print "Size", buffer.size, "width", width, "height", height, "colorbits", colorbits'''
-        self.Image.fromstring(buf)
-        img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
-        self.ledwand.drawImage4(self.flat(img))
+        ''' HIER MUSS FRAMEDROPPING HIN'''
+        self.Framecount += 1
+        if(self.Framecount >= self.Framedrop):
+            self.Image.fromstring(buf)
+            img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
+            self.ledwand.drawImage4(self.flat(img))
+            self.Framecount = 0
         return gst.FLOW_OK
 
     def flat(self, img):

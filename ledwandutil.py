@@ -2,6 +2,7 @@
 from socket import *
 import urllib
 import Image
+import struct
 
 '''
 ----------------------------------------------------------------------------
@@ -80,11 +81,6 @@ class Ledwand:
                 #self.request(16, data[i], partsize, 2342, 2342, self.DisplayBuf[data[i]:data[i]+partsize])
         #print "saved", fullsize-1, "bytes"
         
-    def convert(self, x):
-        x1 = x/256
-        x2 = x%256
-        return chr(x2) + chr(x1)
-
     def request(self, cmd, xpos, ypos, xs, ys, text):
         self.requestnowait(cmd, xpos, ypos, xs, ys, text)
         try:
@@ -94,12 +90,8 @@ class Ledwand:
             #pass
 
     def requestnowait(self, cmd, xpos, ypos, xs, ys, text):
-        cmd = self.convert(cmd)
-        xpos = self.convert(xpos)
-        ypos = self.convert(ypos)
-        xs = self.convert(xs)
-        ys = self.convert(ys)
-        self.UdpSocket.sendto(cmd + xpos + ypos + xs + ys + text, self.UdpAddress)
+        data = struct.pack("HHHHH", cmd, xpos, ypos, xs, ys) + text
+        self.UdpSocket.sendto(data, self.UdpAddress)
 
     def setline(self, x, y, data):
         self.request(4, x, y, 1, 1, data)
