@@ -1,0 +1,8 @@
+#!/bin/sh
+
+./video.py $1 &
+VIDEO=$!
+nvlc --novideo "$*"
+
+kill -9 $VIDEO
+
