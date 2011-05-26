@@ -114,7 +114,7 @@ int Regular_to_Ledbuffer2(const char* imagebuf, uint32_t len, char* ledbuffer)
 }
 
 
-int compare_Buffs(const char* buf1, const size_t buf1_len, const char* buf2, const size_t buf2_len, char* diffbuf, const size_t diffbuf_len)
+int compare_Buffs(const char* buf1, const uint32_t buf1_len, const char* buf2, const uint32_t buf2_len, char* diffbuf, const uint32_t diffbuf_len)
 {
     if(buf1_len != buf2_len && buf1_len != diffbuf_len)
     {
