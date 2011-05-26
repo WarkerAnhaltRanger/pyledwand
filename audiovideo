@@ -1,6 +1,6 @@
 #!/bin/sh
 
-./video.py $1 &
+python video.py $1 &
 VIDEO=$!
 nvlc --novideo "$*"
 
