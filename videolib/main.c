@@ -124,11 +124,12 @@ int compare_Buffs(const char* buf1, const size_t buf1_len, const char* buf2, con
 
     size_t i = 0;
 
-    /*for(i=0; i<buf1_len; i+=sizeof(uint32_t))
-        diffbuf[i] = *((uint32_t*)buf1+i) ^ *((uint32_t*)buf2+i);*/
+    size_t *p_buf1 = (uint32_t*)buf1;
+    size_t *p_buf2 = (uint32_t*)buf2;
+    size_t *p_diffbuf = (uint32_t*)diffbuf;
 
-    for(i=0; i<buf1_len; i++)
-        diffbuf[i] = buf1[i]^buf2[i];
+    for(i=0; i<(buf1_len/sizeof(size_t)); i++)
+        p_diffbuf[i] = p_buf1[i]^p_buf2[i];
 
     return 0;
 }
