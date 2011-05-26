@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import gst
 from imaging import ImageLedwand
 import ImageFilter
@@ -6,6 +7,7 @@ import Image
 from threading import Thread
 import sys
 import os
+import time
 
 loop = None
 
@@ -24,17 +26,21 @@ class LedwandSink(gst.BaseSink):
         self.Image = Image.new("L", (448, 200))
         self.ledwand.setbrightness(4)
         self.ledwand.clear()
-        self.Framecount = 0
-        self.Framedrop = 2
-        
+        #self.Framecount = 0.0
+	#self.Framedrop = 3.8
+	TargetFPS = 25.0
+	self.nextFrame = 0.0
+	self.frameDelta = 1.0/TargetFPS
+
     def do_render(self, buf):
         ''' HIER MUSS FRAMEDROPPING HIN'''
-        self.Framecount += 1
-        if(self.Framecount >= self.Framedrop):
+	t = time.time()
+	if (t <= self.nextFrame):
             self.Image.fromstring(buf)
             img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
             self.ledwand.drawImage4(self.flat(img))
-            self.Framecount = 0
+	    #self.Framecount += self.Framedrop
+	self.nextFrame = t + self.frameDelta
         return gst.FLOW_OK
 
     def flat(self, img):
@@ -44,7 +50,7 @@ class MyPlayer:
     def __init__(self, filepath):
         self.player = gst.element_factory_make("playbin2")
         self.player.set_property("uri", "file://" +filepath)
-        self.player.set_property("flags",  0x01) 
+        self.player.set_property("flags",  0x01)
         #sink = gst.element_factory_make("aasink")
         #sink = gst.element_factory_make("xvimagesink")
         sink = LedwandSink("sink")
