@@ -26,21 +26,26 @@ class LedwandSink(gst.BaseSink):
         self.Image = Image.new("L", (448, 200))
         self.ledwand.setbrightness(4)
         self.ledwand.clear()
-        #self.Framecount = 0.0
-	#self.Framedrop = 3.8
-	TargetFPS = 25.0
+        self.FrameCount = 0.0
+	self.FramesDrawn = 0.0
+	self.TargetFPS = 25.0
 	self.nextFrame = 0.0
-	self.frameDelta = 1.0/TargetFPS
+	self.frameDelta = 1.0/self.TargetFPS
 
     def do_render(self, buf):
         ''' HIER MUSS FRAMEDROPPING HIN'''
+	if self.nextFrame == 0.0:
+	    self.nextFrame = time.time()
 	t = time.time()
-	if (t <= self.nextFrame):
+	self.FrameCount += 1.0
+	if (t-0.1 <= self.nextFrame):
+	    self.FramesDrawn += 1.0
+	    print "current framerate: %.2ffps\r" % ((self.FramesDrawn/self.FrameCount)*self.TargetFPS),
             self.Image.fromstring(buf)
             img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
             self.ledwand.drawImage4(self.flat(img))
 	    #self.Framecount += self.Framedrop
-	self.nextFrame = t + self.frameDelta
+	self.nextFrame += self.frameDelta
         return gst.FLOW_OK
 
     def flat(self, img):
