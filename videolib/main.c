@@ -4,10 +4,10 @@
 #define LINES 20
 #define LINELEN 56
 #define MODWIDTH 8
-#define MODHEIGHT 12
+#define MODHEIGHT 10
 #define BIAS 5
 
-int Image_to_Ledbuffer(const char* imagebuf, uint32_t len, char* ledbuffer)
+int Image_to_Ledbuffer(const char* imagebuf, const uint32_t len, char* ledbuffer)
 {
     if(len != LINES*LINELEN*MODWIDTH*MODWIDTH)
     {
@@ -30,17 +30,17 @@ int Image_to_Ledbuffer(const char* imagebuf, uint32_t len, char* ledbuffer)
     return 0;
 }
 
-int Regular_to_Ledbuffer(const char* imagebuf, uint32_t len, char* ledbuffer)
+int Regular_to_Ledbuffer(const char* imagebuf, const uint32_t len, char* ledbuffer)
 {
-    if(len != LINES*LINELEN*MODWIDTH*MODWIDTH)
+    if(len != LINES*LINELEN*MODWIDTH*MODHEIGHT)
     {
-        printf("size of imagebuf should be %d but is %d\n", LINELEN*LINES*MODWIDTH*MODWIDTH, len);
+        printf("size of imagebuf should be %d but is %d\n", LINELEN*LINES*MODWIDTH*MODHEIGHT, len);
         return 1;
     }
     uint32_t i = 0, pos = 0;
     for(i = 0; i<LINELEN*MODWIDTH*LINES; i++)
     {
-        pos = (i%(LINELEN*MODWIDTH))+(((uint32_t)(i/(MODWIDTH*LINELEN)))*MODWIDTH*LINELEN*MODWIDTH);
+        pos = (i%(LINELEN*MODWIDTH))+(((uint32_t)(i/(MODWIDTH*LINELEN)))*MODWIDTH*LINELEN*MODHEIGHT);
         ledbuffer[i] =  (imagebuf[pos] & 0x80) |
                         ((imagebuf[pos+LINELEN*MODWIDTH]>>1) & 0x40) |
                         ((imagebuf[pos+2*LINELEN*MODWIDTH]>>2) & 0x20) |

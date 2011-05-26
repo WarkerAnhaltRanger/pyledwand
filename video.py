@@ -14,14 +14,14 @@ class LedwandSink(gst.BaseSink):
         gst.PadTemplate("sink",
                         gst.PAD_SINK,
                         gst.PAD_ALWAYS,
-                        gst.Caps("video/x-raw-gray, width=448, height=160")),
+                        gst.Caps("video/x-raw-gray, width=448, height=200")),
         )
 
     def __init__(self, name):
         self.__gobject_init__()
         self.set_name(name)
         self.ledwand = ImageLedwand(timeout=1) #30fps = 0.033s/7Parts~=4ms
-        self.Image = Image.new("L", (448, 160))
+        self.Image = Image.new("L", (448, 200))
         self.ledwand.setbrightness(4)
         self.ledwand.clear()
         
