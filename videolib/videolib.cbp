@@ -25,6 +25,7 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-march=core2" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>

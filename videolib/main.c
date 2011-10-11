@@ -7,6 +7,54 @@
 #define MODHEIGHT 10
 #define BIAS 5
 
+#define WIDTH 448
+#if defined(__LP64__)
+#define SIZE (WIDTH/8)
+#else
+#define SIZE (WIDTH/4)
+#endif
+#define STEP (MODHEIGHT*SIZE)
+
+int fast_img_convert(const char* imgbuf, const uint32_t len, char* ledbuf)
+{
+    if(len != LINES*LINELEN*MODWIDTH*MODHEIGHT)
+    {
+        printf("size of imagebuf hould be %d but is %d\n", LINELEN*LINES*MODWIDTH*MODHEIGHT, len);
+        return 1;
+    }
+
+    size_t *in =  (size_t*)imgbuf;
+    size_t *res = (size_t*)ledbuf;
+    size_t t1, s, i;
+    for(s = 0; s < LINES*STEP; s+=STEP){
+        t1 = (s%STEP)*SIZE;
+        for(i = 0; i < SIZE; ++i){
+#if defined(__LP64__)
+            res[i+t1] = (0x8080808080808080 & in[i+s]) |
+                        (0x4040404040404040 & in[i+s+SIZE]) |
+                        (0x2020202020202020 & in[i+s+2*SIZE]) |
+                        (0x1010101010101010 & in[i+s+3*SIZE]) |
+                        (0x0808080808080808 & in[i+s+4*SIZE]) |
+                        (0x0404040404040404 & in[i+s+5*SIZE]) |
+                        (0x0202020202020202 & in[i+s+6*SIZE]) |
+                        (0x0101010101010101 & in[i+s+7*SIZE]);
+#else
+            res[i+t1] = (0x80808080 & in[i+s]) |
+                        (0x40404040 & in[i+s+SIZE]) |
+                        (0x20202020 & in[i+s+2*SIZE]) |
+                        (0x10101010 & in[i+s+3*SIZE]) |
+                        (0x08080808 & in[i+s+4*SIZE]) |
+                        (0x04040404 & in[i+s+5*SIZE]) |
+                        (0x02020202 & in[i+s+6*SIZE]) |
+                        (0x01010101 & in[i+s+7*SIZE]);
+#endif
+        }
+    }
+
+    return 0;
+}
+
+
 int Image_to_Ledbuffer(const char* imagebuf, const uint32_t len, char* ledbuffer)
 {
     if(len != LINES*LINELEN*MODWIDTH*MODWIDTH)
