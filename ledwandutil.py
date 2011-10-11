@@ -83,11 +83,6 @@ class Ledwand:
         
     def request(self, cmd, xpos, ypos, xs, ys, text):
         self.requestnowait(cmd, xpos, ypos, xs, ys, text)
-        try:
-            self.UdpSocket.recv(4096)
-        except timeout:
-            print "Warning: last transmission timed out"
-            #pass
 
     def requestnowait(self, cmd, xpos, ypos, xs, ys, text):
         data = struct.pack("HHHHH", cmd, xpos, ypos, xs, ys) + text
