@@ -9,7 +9,6 @@ class ImageLedwand(Ledwand):
         self.ImageBuf = create_string_buffer(self.Lines*self.Linelen*self.ModuleWidth)
         self.ImageCmp = create_string_buffer(self.Lines*self.Linelen*self.ModuleWidth)
         self.setbrightness(4)
-        self.curve = bytearray(256)
 
     def drawImageFile(self, path):
         self.drawImage(Image.open(path))

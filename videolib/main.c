@@ -19,7 +19,7 @@ int fast_img_convert(const char* imgbuf, const uint32_t len, char* ledbuf)
 {
     if(len != LINES*LINELEN*MODWIDTH*MODHEIGHT)
     {
-        printf("size of imagebuf hould be %d but is %d\n", LINELEN*LINES*MODWIDTH*MODHEIGHT, len);
+        printf("size of imagebuf should be %d but is %d\n", LINELEN*LINES*MODWIDTH*MODHEIGHT, len);
         return 1;
     }
 
@@ -27,8 +27,8 @@ int fast_img_convert(const char* imgbuf, const uint32_t len, char* ledbuf)
     size_t *res = (size_t*)ledbuf;
     size_t t1, s, i;
     for(s = 0; s < LINES*STEP; s+=STEP){
-        t1 = (s%STEP)*SIZE;
-        for(i = 0; i < SIZE; ++i){
+        t1 = (s/STEP)*SIZE;
+        for(i = 0; i < SIZE; i++){
 #if defined(__LP64__)
             res[i+t1] = (0x8080808080808080 & in[i+s]) |
                         (0x4040404040404040 & in[i+s+SIZE]) |
@@ -59,7 +59,7 @@ int Image_to_Ledbuffer(const char* imagebuf, const uint32_t len, char* ledbuffer
 {
     if(len != LINES*LINELEN*MODWIDTH*MODWIDTH)
     {
-        printf("size of imagebuf hould be %d but is %d\n", LINELEN*LINES*MODWIDTH*MODWIDTH, len);
+        printf("size of imagebuf should be %d but is %d\n", LINELEN*LINES*MODWIDTH*MODWIDTH, len);
         return 1;
     }
     uint32_t i = 0, pos = 0, step = LINELEN*MODWIDTH*(MODWIDTH-1);

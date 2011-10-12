@@ -26,7 +26,9 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-march=core2" />
+					<Add option="-fomit-frame-pointer" />
 					<Add option="-O2" />
+					<Add option="-fPIC" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
