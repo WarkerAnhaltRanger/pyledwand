@@ -74,11 +74,11 @@ def main():
         print "Keine quelle angegeben"
         quit()
 
-	if args[1].startswith("http://") || args[1].startswith("https://") || args[1].("ftp://"):
-		filepath = args[1]
-	else: 
-    	filepath = "file://" + os.path.abspath(args[1])
-    
+	if os.path.exists(args[1]):
+		filepath = "file://" + os.path.abspath(args[1])
+	else:
+		filepath = args[1] 
+    	
     print "started main"
     mp = MyPlayer(filepath)
     mp.play()
