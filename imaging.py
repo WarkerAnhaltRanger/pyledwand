@@ -9,9 +9,10 @@ class ImageLedwand(Ledwand):
         self.ImageBuf = create_string_buffer(self.Lines*self.Linelen*self.ModuleWidth)
         self.ImageCmp = create_string_buffer(self.Lines*self.Linelen*self.ModuleWidth)
         self.setbrightness(4)
+		self.DisplayBuf = self.ImageBuf
 
     def drawImageFile(self, path):
-        self.drawImage(Image.open(path))
+        self.drawImage4(Image.open(path))
 
     def drawResizedImageFile(self, path):
         img = self.resizeImage(Image.open(path))
@@ -28,25 +29,16 @@ class ImageLedwand(Ledwand):
         print "factor", factor
         return img.resize((int(factor*xs), int(factor*ys)))
     
-    def drawImage(self, img):   
-        img = img.convert("1")
-        xs, ys = img.size
-        x, y = 0, 0
-        for pix in img.getdata():
-            if x >= xs:
-                y, x = y+1, 0
-            if pix > 0:
-                self.setpixel(x,y,True)
-            else:
-                self.setpixel(x,y,False)
-            x=x+1
-        self.drawbuffer()
+	def drawImage(self, data):
+		if self.videolib.fast_img_convert(data, len(data), self.DisplayBuf):
+			print "ERROR"
+		self.drawbuffer()
 
     def drawImage4(self, data):
         self.ImageBuf2 = self.ImageBuf[:]
-        if self.videolib.Regular_to_Ledbuffer(data, len(data), self.ImageBuf) != 0:
+        if self.videolib.fast_img_convert(data, len(data), self.ImageBuf):
             print "ERROR"
-        if self.videolib.compare_Buffs(self.ImageBuf, len(self.ImageBuf), self.ImageBuf2, len(self.ImageBuf2), self.ImageCmp, len(self.ImageCmp) != 0):
+        if self.videolib.compare_Buffs(self.ImageBuf, len(self.ImageBuf), self.ImageBuf2, len(self.ImageBuf2), self.ImageCmp, len(self.ImageCmp)):
             print "compare buffer ERROR"
         self.DisplayBuf = self.ImageBuf
         self.drawDiffImage(self.ImageCmp)

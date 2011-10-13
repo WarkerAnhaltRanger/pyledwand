@@ -42,6 +42,8 @@ class Ledwand:
         self.DisplayBuf = bytearray(linelen*lines*self.ModuleWidth)
         self.UdpSocket.settimeout(timeout)
         self.Parts = 7
+	self.partsize = (self.Lines * self.Linelen * self.ModuleWidth) / self.Parts
+        
         
     def processline(self, line):
         if len(line) < self.Linelen:
@@ -61,12 +63,9 @@ class Ledwand:
 
     def drawbuffer(self):
         #split into 7 parts to avoid crashing of the Screen
-        partsize = (self.Lines * self.Linelen * self.ModuleWidth) / self.Parts
-        for i in range(self.Parts):
-            if i !=(self.Parts-1):
-                self.request(16, i*partsize, partsize, 5, 5, self.DisplayBuf[i*partsize:i*partsize+partsize])
-            else:
-               self.request(16, i*partsize, partsize, 2342, 2342, self.DisplayBuf[i*partsize:i*partsize+partsize])
+        for i in range(self.Parts-1):
+            self.requestnowait(16, i*self.partsize, self.partsize, 5, 5, self.DisplayBuf[i*self.partsize:(i+1)*self.partsize])
+        self.requestnowait(16, self.Parts*self.partsize, self.partsize, 2342, 2342, self.DisplayBuf[self.Parts*self.partsize:(self.Parts+1)*self.partsize])
 
     def drawselectedbuffer(self, data):
         #print data

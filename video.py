@@ -22,7 +22,7 @@ class LedwandSink(gst.BaseSink):
     def __init__(self, name):
         self.__gobject_init__()
         self.set_name(name)
-        self.ledwand = ImageLedwand(timeout=1) #30fps = 0.033s/7Parts~=4ms
+        self.ledwand = ImageLedwand()
         self.Image = Image.new("L", (448, 200))
         self.ledwand.setbrightness(4)
         self.ledwand.clear()
@@ -30,7 +30,8 @@ class LedwandSink(gst.BaseSink):
     def do_render(self, buf):
         self.Image.fromstring(buf)
         img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
-        self.ledwand.drawImage4(self.flat(img))
+        #self.ledwand.drawImage4(self.flat(img))
+	self.ledwand.drawImage(self.flat(img))
 	return gst.FLOW_OK
 
     def flat(self, img):
@@ -41,11 +42,7 @@ class MyPlayer:
         self.player = gst.element_factory_make("playbin2")
         self.player.set_property("uri", "file://" +filepath)
         self.player.set_property("flags",  0x01)
-        #sink = gst.element_factory_make("aasink")
-        #sink = gst.element_factory_make("xvimagesink")
         sink = LedwandSink("sink")
-        #zero = gst.element_factory_make("fakesink")
-        #self.player.set_property("audio_sink", zero)
         self.player.set_property("video_sink", sink)
         bus = self.player.get_bus()
         bus.add_watch(self.on_message)
