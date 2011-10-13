@@ -16,23 +16,40 @@ class LedwandSink(gst.BaseSink):
         gst.PadTemplate("sink",
                         gst.PAD_SINK,
                         gst.PAD_ALWAYS,
-                        gst.Caps("video/x-raw-gray, width=448, height=200")),
+			gst.Caps("video/x-raw-gray, width=448, height=240")),
         )
 
     def __init__(self, name):
         self.__gobject_init__()
         self.set_name(name)
-        self.ledwand = ImageLedwand()
-        self.Image = Image.new("L", (448, 200))
+        self.ledwand = ImageLedwand(timeout=1) #30fps = 0.033s/7Parts~=4ms
+        self.Image = Image.new("L", (448, 240))
         self.ledwand.setbrightness(4)
         self.ledwand.clear()
-        
+        self.FrameCount = 0.0
+	self.FramesDrawn = 0.0
+	self.TargetFPS = 25.0
+	self.nextFrame = 0.0
+	self.frameDelta = 1.0/self.TargetFPS
+
     def do_render(self, buf):
+        ''' HIER MUSS FRAMEDROPPING HIN'''
+	#if self.nextFrame == 0.0:
+	#    self.nextFrame = time.time()
+	#t = time.time()
+	#self.FrameCount += 1.0
+	#if (t-0.1 <= self.nextFrame):
+	#    self.FramesDrawn += 1.0
+	#    print "current framerate: %.2ffps\r" % ((self.FramesDrawn/self.FrameCount)*self.TargetFPS),
         self.Image.fromstring(buf)
         img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
-        #self.ledwand.drawImage4(self.flat(img))
-	self.ledwand.drawImage(self.flat(img))
-	return gst.FLOW_OK
+        self.ledwand.drawImage2(self.flat(img))
+	    #self.Framecount += self.Framedrop
+	#self.nextFrame += self.frameDelta
+	#self.Image.fromstring(buf)
+	#img = self.Image.filter(ImageFilter.EDGE_ENHANCE).convert("1")
+	#self.ledwand.drawImage4(self.flat(img))
+        return gst.FLOW_OK
 
     def flat(self, img):
         return str(bytearray(list(img.getdata())))
@@ -40,9 +57,13 @@ class LedwandSink(gst.BaseSink):
 class MyPlayer:
     def __init__(self, filepath):
         self.player = gst.element_factory_make("playbin2")
-        self.player.set_property("uri", filepath)
+        self.player.set_property("uri", "file://" +filepath)
         self.player.set_property("flags",  0x01)
+        #sink = gst.element_factory_make("aasink")
+        #sink = gst.element_factory_make("xvimagesink")
         sink = LedwandSink("sink")
+        #zero = gst.element_factory_make("fakesink")
+        #self.player.set_property("audio_sink", zero)
         self.player.set_property("video_sink", sink)
         bus = self.player.get_bus()
         bus.add_watch(self.on_message)
@@ -74,11 +95,12 @@ def main():
         print "Keine quelle angegeben"
         quit()
 
-	if os.path.exists(args[1]):
-		filepath = "file://" + os.path.abspath(args[1])
-	else:
-		filepath = args[1] 
-    	
+    inp = args[1]
+    if inp.startswith("http"):
+	filepath = inp
+    else:
+        filepath = os.path.abspath(inp)
+    
     print "started main"
     mp = MyPlayer(filepath)
     mp.play()

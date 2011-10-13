@@ -4,7 +4,7 @@
 #define LINES 20
 #define LINELEN 56
 #define MODWIDTH 8
-#define MODHEIGHT 10
+#define MODHEIGHT 12
 #define BIAS 5
 
 #define WIDTH 448

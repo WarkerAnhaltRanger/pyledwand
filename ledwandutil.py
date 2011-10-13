@@ -3,6 +3,7 @@ from socket import *
 import urllib
 import Image
 import struct
+import time
 
 '''
 ----------------------------------------------------------------------------
@@ -32,7 +33,7 @@ def HttpRequest(url, params=dict()):
 
 class Ledwand:
 
-    def __init__(self, host="172.23.42.120",port=2342, timeout=1, linelen=56, lines=20, module_width=8, module_height=12):
+    def __init__(self, host="172.23.42.29",port=2342, timeout=0.005, linelen=56, lines=20, module_width=8, module_height=13):
         self.UdpSocket = socket(AF_INET, SOCK_DGRAM)
         self.UdpAddress = (host, port)
         self.Linelen = linelen
@@ -40,10 +41,9 @@ class Ledwand:
         self.ModuleWidth = module_width
         self.ModuleHeight = module_height
         self.DisplayBuf = bytearray(linelen*lines*self.ModuleWidth)
-        self.UdpSocket.settimeout(timeout)
+        #self.UdpSocket.settimeout(timeout)
         self.Parts = 7
 	self.partsize = (self.Lines * self.Linelen * self.ModuleWidth) / self.Parts
-        
         
     def processline(self, line):
         if len(line) < self.Linelen:
@@ -63,9 +63,12 @@ class Ledwand:
 
     def drawbuffer(self):
         #split into 7 parts to avoid crashing of the Screen
-        for i in range(self.Parts-1):
-            self.requestnowait(16, i*self.partsize, self.partsize, 5, 5, self.DisplayBuf[i*self.partsize:(i+1)*self.partsize])
-        self.requestnowait(16, self.Parts*self.partsize, self.partsize, 2342, 2342, self.DisplayBuf[self.Parts*self.partsize:(self.Parts+1)*self.partsize])
+        #partsize = (self.Lines * self.Linelen * self.ModuleWidth) / self.Parts
+        for i in range(self.Parts):
+            if i !=(self.Parts-1):
+            	self.request(16, i*self.partsize, self.partsize, 5, 5, self.DisplayBuf[i*self.partsize:(i+1)*self.partsize])
+            else:
+        	self.request(16, i*self.partsize, self.partsize, 2342, 2342, self.DisplayBuf[i*self.partsize:(i+1)*self.partsize])
 
     def drawselectedbuffer(self, data):
         #print data
@@ -80,12 +83,18 @@ class Ledwand:
                 #self.request(16, data[i], partsize, 2342, 2342, self.DisplayBuf[data[i]:data[i]+partsize])
         #print "saved", fullsize-1, "bytes"
         
-    def request(self, cmd, xpos, ypos, xs, ys, text):
-        self.requestnowait(cmd, xpos, ypos, xs, ys, text)
+    #def request(self, cmd, xpos, ypos, xs, ys, text):
+    #    self.requestnowait(cmd, xpos, ypos, xs, ys, text)
+    #    try:
+    #        self.UdpSocket.recv(4096)
+    #    except timeout:
+    #        print "Warning: last transmission timed out"
+            #pass
 
-    def requestnowait(self, cmd, xpos, ypos, xs, ys, text):
+    def request(self, cmd, xpos, ypos, xs, ys, text):
         data = struct.pack("HHHHH", cmd, xpos, ypos, xs, ys) + text
         self.UdpSocket.sendto(data, self.UdpAddress)
+	time.sleep(0.004)
 
     def setline(self, x, y, data):
         self.request(4, x, y, 1, 1, data)
