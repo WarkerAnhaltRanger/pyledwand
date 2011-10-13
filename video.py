@@ -40,7 +40,7 @@ class LedwandSink(gst.BaseSink):
 class MyPlayer:
     def __init__(self, filepath):
         self.player = gst.element_factory_make("playbin2")
-        self.player.set_property("uri", "file://" +filepath)
+        self.player.set_property("uri", filepath)
         self.player.set_property("flags",  0x01)
         sink = LedwandSink("sink")
         self.player.set_property("video_sink", sink)
@@ -73,7 +73,11 @@ def main():
     if len(args) < 2:
         print "Keine quelle angegeben"
         quit()
-    filepath = os.path.abspath(args[1])
+
+	if args[1].startswith("http://") || args[1].startswith("https://") || args[1].("ftp://"):
+		filepath = args[1]
+	else: 
+    	filepath = "file://" + os.path.abspath(args[1])
     
     print "started main"
     mp = MyPlayer(filepath)
