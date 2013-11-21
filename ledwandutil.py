@@ -92,7 +92,7 @@ class Ledwand:
             #pass
 
     def request(self, cmd, xpos, ypos, xs, ys, text):
-        data = struct.pack("HHHHH", cmd, xpos, ypos, xs, ys) + text
+        data = struct.pack("!HHHHH", cmd, xpos, ypos, xs, ys) + text
         self.UdpSocket.sendto(data, self.UdpAddress)
 	time.sleep(0.004)
 
