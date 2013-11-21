@@ -100,7 +100,7 @@ def main():
 	filepath = inp
     else:
         filepath = os.path.abspath(inp)
-    
+
     print "started main"
     mp = MyPlayer(filepath)
     mp.play()

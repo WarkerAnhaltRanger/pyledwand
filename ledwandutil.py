@@ -44,7 +44,7 @@ class Ledwand:
         #self.UdpSocket.settimeout(timeout)
         self.Parts = 7
 	self.partsize = (self.Lines * self.Linelen * self.ModuleWidth) / self.Parts
-        
+
     def processline(self, line):
         if len(line) < self.Linelen:
             return bytearray(line)
@@ -82,7 +82,7 @@ class Ledwand:
                 self.request(16, data[i][0], partsize, 2342, 2342, self.DisplayBuf[data[i][0]:data[i][1]])
                 #self.request(16, data[i], partsize, 2342, 2342, self.DisplayBuf[data[i]:data[i]+partsize])
         #print "saved", fullsize-1, "bytes"
-        
+
     #def request(self, cmd, xpos, ypos, xs, ys, text):
     #    self.requestnowait(cmd, xpos, ypos, xs, ys, text)
     #    try:
@@ -127,7 +127,7 @@ class Ledwand:
 
     def sendfilledBuf(self):
         self.request(3, 0, 0, self.Linelen, self.Lines, self.DisplayBuf.decode("utf8").encode("cp437"))
-    
+
     def clearBuf(self):
         self.DisplayBuf = bytearray(self.Linelen*self.Lines)
 

@@ -53,7 +53,7 @@ class VbbFahrt:
 class VbbRequest(LedwandProvider):
     def __init__(self, url = "http://www.vbb-fahrinfo.de/hafas/stboard.exe/dn?", stop="S+U Friedrichstr. Bhf (Berlin)", howmany=20, futuretime=8):
         LedwandProvider.__init__(self)
-        self.Url = url 
+        self.Url = url
         self.Stop = stop
         self.Howmany = howmany
         self.List = list()
@@ -66,7 +66,7 @@ class VbbRequest(LedwandProvider):
             m = m / 60
             h += 1
         h = (h + t.tm_hour)%24
-        return HttpRequest(self.Url, {"boardOverview":"yes", "maxJourneys":self.Howmany, "boardType":"dep", "input":self.Stop, "start":"Start", "time":"%s:%s"%(h,m), "start":"Erstellen"})        
+        return HttpRequest(self.Url, {"boardOverview":"yes", "maxJourneys":self.Howmany, "boardType":"dep", "input":self.Stop, "start":"Start", "time":"%s:%s"%(h,m), "start":"Erstellen"})
 
     def getData(self):
         self.clear()

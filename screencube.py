@@ -26,7 +26,7 @@ class ScreenCube(LedwandProvider):
         self.current = None
         self.screens = list()
         self.data = list()
-        
+
 
     def set_current(self):
         self.current = self.screens[self.position]
@@ -44,7 +44,7 @@ class ScreenCube(LedwandProvider):
         if self.position < len(self.screens)-1:
             self.position += 1
             self.set_current()
-    
+
     def getData(self):
         if self.current != None:
             return self.current.getData()
@@ -92,7 +92,7 @@ def main():
             exit()
         else:
             print ord(c)
-            
-    
+
+
 if __name__ == "__main__":
     main()

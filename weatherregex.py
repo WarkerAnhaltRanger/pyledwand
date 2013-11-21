@@ -58,5 +58,5 @@ class WeatherRequest(LedwandProvider):
 if __name__ == "__main__":
     weather = WeatherRequest()
     weather.Ledwand.clear()
-    
+
     weather.displayData()
