@@ -30,8 +30,8 @@ class ImageLedwand(Ledwand):
             factor = yfactor
         print "factor", factor
         return img.resize((int(factor*xs), int(factor*ys)))
-    
-    def drawImage(self, img):   
+
+    def drawImage(self, img):
         img = img.convert("1")
         xs, ys = img.size
         x, y = 0, 0
@@ -82,7 +82,7 @@ class ImageLedwand(Ledwand):
             self.curve[i] = 127 * (self.curve[i]/127)**gamma
         for(i in range(127)):
             self.curve[255-i] = 128 * ((255-self.curve[255-i])/127)**gamma'''
-            
+
 def main():
     print "started main"
     ledwand = ImageLedwand()
